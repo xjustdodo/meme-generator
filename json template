@@ -1,0 +1,26 @@
+const generateMemeBtn = document.querySelector(".meme-generator .generate-meme-btn");
+const videoContainer = document.querySelector("#video-container"); // Das HTML-Element, in dem das Video eingebettet wird
+
+const url = 'https://k-pop.p.rapidapi.com/songs/random';
+const options = {
+	method: 'GET',
+	headers: {
+		'X-RapidAPI-Key': '12230dd324msh746bb451874e87fp176a27jsnb038e405b92e',
+		'X-RapidAPI-Host': 'k-pop.p.rapidapi.com'
+  }
+};
+
+async function generateVideo() {
+	  try {
+		const response = await fetch(url, options);
+		const result = await response.text();
+		console.log(result);
+	  } catch (error) {
+		console.error(error);
+	  }
+	}
+
+generateMemeBtn.addEventListener("click", generateVideo);
+
+/* LIGHT/DARKMODE toggle */
+// (Dein bestehender Code für den Dark/Light-Modus bleibt unverändert)

@@ -1,93 +1,59 @@
+const generateMemeBtn = document.querySelector(".meme-generator .generate-meme-btn");
+const videoContainer = document.querySelector(".meme-generator .video-container");
 
-const formEl = document.querySelector("form");
-
-const inputEl = document.getElementById ("search-input");
-let inputData = ""
-    
-const url = `https://meme-api.com/gimme/${inputData}`;
-/* if (inputData =! "") {*/
-    console.log (inputEl.value);
-
-
-
-
-const generateMemeBtn = document.querySelector(
-  ".meme-generator .generate-meme-btn"
-);
-const memeImage = document.querySelector(".meme-generator img");
-const memeTitle = document.querySelector(".meme-generator .meme-title");
-const memeAuthor = document.querySelector(".meme-generator .meme-author");
-
-
-const updateDetails = (url, title, author) => {
-  memeImage.setAttribute("src", url);
-  memeTitle.innerHTML = title;
-  memeAuthor.innerHTML = `Meme by: ${author}`;
-};
-
-async function generateMeme(){
-  inputData = inputEl.value;
-  const url = `https://meme-api.com/gimme/${inputData}`;
-try{
-  const response = await fetch (url)
-  const data = await response.json()
-  .then ((data) => {
-    updateDetails(data.url, data.title, data.author);
-    });
-  } catch (error) {
-    alert("No sub entered :c");
-  };
-};
-
-
-formEl.addEventListener("submit", (event) => {
-  event.preventDefault()
-  generateMeme();
-  
-});
-
-generateMemeBtn.addEventListener("click", generateMeme);
-
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Tab") {
-    event.preventDefault();
-    generateMeme();
+const url = 'https://k-pop.p.rapidapi.com/songs/random';
+const options = {
+  method: 'GET',
+  headers: {
+    'X-RapidAPI-Key': '12230dd324msh746bb451874e87fp176a27jsnb038e405b92e',
+    'X-RapidAPI-Host': 'k-pop.p.rapidapi.com'
   }
-});
+};
+
+async function generateVideo() {
+  try {
+    const response = await fetch(url, options);
+    const data = await response.json();
+    console.log(data);
 
 
-/* LIGHT/DARKMODE toggle */
+    
 
+    if (data && data.data && data.data.length > 0) {
+      const videoUrl = data.data[0].Video;
+      console.log(videoUrl);
 
-const toggle = document.getElementById("toggleDark");
-const body = document.querySelector("body");
-const memegenerator = document.querySelector(".meme-generator");
-const searchinput = document.querySelector("#search-input");
+      
+      if (videoUrl) {
+        // Extrahiere die Video-ID aus der YouTube-URL
+        const videoId = extractVideoId(videoUrl);
+        console.log(videoId);
 
-toggle.addEventListener("click", function(){
-    this.classList.toggle("bi-moon");
-    if(this.classList.toggle("bi-brightness-high-fill")){
+        if (videoId) {
+      
+          // Erstelle die neue URL im gewünschten Format
+          const embeddedVideoUrl = `https://www.youtube.com/embed/${videoId}`;
 
-        body.style.background = "#D7DFE2";
-        body.style.color ="black";
-        body.style.transition = "2s";
-        memegenerator.style.background = "#fff";
-        memegenerator.style.transition = "2s";
-        searchinput.style.background = "#fff";
-        searchinput.style.transition = "2s";
-        searchinput.style.color = "black";
-    }else{
-        body.style.background ="#030303" ;
-        body.style.color = "white";
-        body.style.transition = "2s";
-        memegenerator.style.background = "#1A1A1B";
-        memegenerator.style.transition = "2s";
-        searchinput.style.background = "#272729";
-        searchinput.style.transition = "2s";
-        searchinput.style.color = "white";
-        
-    };
-});
+          // Aktualisiere das iframe-Element
+          videoContainer.innerHTML = `<iframe width="560" height="315" src="${embeddedVideoUrl}" frameborder="0" allowfullscreen></iframe>`;
+        } else {
+          console.log('Ungültige Video-URL.');
+        }
+      } else {
+        console.log('Kein Video-Link in der API-Antwort gefunden.');
+      }
+    } else {
+      console.log('Keine Daten in der API-Antwort gefunden.');
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
 
+function extractVideoId(videoUrl) {
+  // Extrahiere die Video-ID aus der youtu.be-URL
+  const videoIdMatch = videoUrl.match(/youtu.be\/([a-zA-Z0-9_-]+)/);
+  return videoIdMatch && videoIdMatch[1];
+}
 
-localStorage.clear();
+generateMemeBtn.addEventListener("click", generateVideo);
